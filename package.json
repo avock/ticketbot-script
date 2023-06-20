@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "cli-table3": "^0.6.3",
+    "puppeteer": "^20.7.2"
+  }
+}
