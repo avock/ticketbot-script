@@ -8,7 +8,7 @@ async function monitorElementStatus() {
   const delayBetweenTabs = 5000; // 10 seconds
   const monitoringInterval = 5000; // 5 seconds
 
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: false, args: ['--incognito'] });
   const mainPage = await browser.newPage();
   const openTabs = [{ page: mainPage, title: 'Main Tab' }]; // Store references to all open tabs with custom titles
 
