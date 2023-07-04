@@ -16,7 +16,7 @@ async function monitorElementStatus() {
   // const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
   const finalURL = 'https://google.com';
 
-  const elementSelector = '.an-bk';
+  const targetElement = '.an-bk';
   const OPEN_TAB_INTERVAL = 5000; // 5 seconds
   const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
   
@@ -37,7 +37,7 @@ async function monitorElementStatus() {
 
   // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
-
+  // keeping track of all texts
   let previousTexts = Array(openTabs.length).fill('');
 
   const table = createTable();
@@ -71,7 +71,7 @@ async function monitorElementStatus() {
     clearTable();
 
     elementStatuses.forEach((status, index) => {
-      if (status.status === 'Changed') {
+      if (status.status !== 'Unchanged') {
         const { title } = openTabs[index];
         addToTable(title, status.status, status.text);
       }
@@ -83,19 +83,18 @@ async function monitorElementStatus() {
   async function evaluateElementStatus(tab, tabIndex) {
     try {
       const page = tab.page;
-      const timeout = 3000; // Timeout in milliseconds
-  
-      const element = await page.waitForSelector(elementSelector, { timeout });
-      if (!element) {
-        // Element not present, move on
-        return { status: 'Not Present', text: '' };
-      }
-  
+      const timeout = 1000; 
+
+      // produces an error if element doesn't exist
+      const element = await page.waitForSelector(targetElement, { timeout });
+      // obtains text within targetElement
       const elementText = await page.evaluate((el) => el.innerText, element);
-      const status = elementText === previousTexts[tabIndex] ? 'Unchanged' : 'Changed';
+      // checks if text in element is changed
+      const status = elementText === previousTexts[tabIndex] ? false : true;
       previousTexts[tabIndex] = elementText;
   
       return { status, text: elementText };
+
     } catch (error) {
       return { status: 'Error', text: 'Error evaluating element status' };
     }
@@ -104,7 +103,7 @@ async function monitorElementStatus() {
 
   function createTable() {
     return new Table({
-      head: ['Tab Title', 'Status', 'Element Text'],
+      head: ['Tab Title', 'Changed?', 'Element Text'],
       colWidths: [20, 20, 40],
     });
   }
