@@ -4,22 +4,32 @@ puppeteer.use(StealthPlugin())
 const Table = require('cli-table3');
 const readline = require('readline');
 require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
 
-async function monitorElementStatus() {
-  const API_KEY_1 = process.env.API_KEY_1
-  const API_KEY_2 = process.env.API_KEY_2
-  const API_KEY = API_KEY_2
-  const scraperAPI = process.env.SCRAPER_API_URL
-  
-  const targetURL = "https://www.ipaddress.my";
-  // const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
-  // const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
-  const finalURL = 'https://google.com';
+// API/Keys Declaration
+const API_KEY_1 = process.env.API_KEY_1
+const API_KEY_2 = process.env.API_KEY_2
+const API_KEY = API_KEY_2
+const scraperAPI = process.env.SCRAPER_API_URL
+const telegramAPI = process.env.TELEGRAM_BOT_API
+const groupChatID = process.env.GROUP_CHAT_ID
 
+// Constant Declaration for Web Bot
+const targetURL = "https://www.ipaddress.my";
+// const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
+const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
+// const finalURL = 'https://google.com';
+
+// Telegram Bot Declaration
+const telegram = new TelegramBot(telegramAPI, { polling: true });
+
+// Interval and Target Element Constants
   const targetElement = '.an-bk';
   const OPEN_TAB_INTERVAL = 5000; // 5 seconds
   const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
-  
+
+  async function monitorElementStatus() {
+
   // // 1. to open in chrome isntead of chromium, remember to run ./url.sh
   // const browser = await puppeteer.connect({
   //   browserWSEndpoint: 'ws://localhost:9222/devtools/browser/afc5dc21-366b-40d0-87d2-9da0c797a3c1'
