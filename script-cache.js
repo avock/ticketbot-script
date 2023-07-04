@@ -16,14 +16,15 @@ async function monitorElementStatus() {
   const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
 
   const elementSelector = '.an-bk';
-  const delayBetweenTabs = 5000; // 5 seconds
+  const OPEN_TAB_INTERVAL = 5000; // 5 seconds
+  const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
   
   // // 1. to open in chrome isntead of chromium, remember to run ./url.sh
   // const browser = await puppeteer.connect({
   //   browserWSEndpoint: 'ws://localhost:9222/devtools/browser/afc5dc21-366b-40d0-87d2-9da0c797a3c1'
   // });
   // const mainPage = await browser.newPage();
-  
+
   // // 2. to open regularly
   // const browser = await puppeteer.launch({ headless: false });\
   // const mainPage = await browser.newPage();
@@ -41,6 +42,34 @@ async function monitorElementStatus() {
 
   await mainPage.goto(finalURL);
 
+  async function openTab() {
+    const newPage = await browser.newPage();
+    const customTitle = `Tab ${openTabs.length + 1}`;
+    openTabs.push({ page: newPage, title: customTitle });
+
+    await newPage.goto(finalURL);
+    await newPage.evaluate((customTitle) => {
+      document.title = customTitle;
+    }, customTitle);
+  }
+
+  async function evaluateElement() {
+    const elementStatuses = await Promise.all(
+      openTabs.map((tab, index) => evaluateElementStatus(tab, index))
+    );
+
+    clearTable();
+
+    elementStatuses.forEach((status, index) => {
+      if (status.status === 'Changed') {
+        const { title } = openTabs[index];
+        addToTable(title, status.status, status.text);
+      }
+    });
+
+    console.log(table.toString());
+  }
+
   async function evaluateElementStatus(tab, tabIndex) {
     try {
       const page = tab.page;
@@ -57,6 +86,11 @@ async function monitorElementStatus() {
     } catch (error) {
       return { status: 'Error', text: 'Error evaluating element status' };
     }
+  }
+
+  async function init() {
+    setInterval(openTab, OPEN_TAB_INTERVAL)
+    setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
   }
 
   function createTable() {
@@ -85,33 +119,8 @@ async function monitorElementStatus() {
     await browser.close();
     process.exit(0);
   });
-
-  while (true) {
-    const newPage = await browser.newPage();
-    const customTitle = `Tab ${openTabs.length + 1}`;
-    openTabs.push({ page: newPage, title: customTitle });
-
-    await newPage.goto(finalURL);
-    await newPage.waitForTimeout(delayBetweenTabs);
-    await newPage.evaluate((customTitle) => {
-      document.title = customTitle;
-    }, customTitle);
-
-    const elementStatuses = await Promise.all(
-      openTabs.map((tab, index) => evaluateElementStatus(tab, index))
-    );
-
-    clearTable();
-
-    elementStatuses.forEach((status, index) => {
-      if (status.status === 'Changed') {
-        const { title } = openTabs[index];
-        addToTable(title, status.status, status.text);
-      }
-    });
-
-    console.log(table.toString());
-  }
+  
+  init()
 }
 
 monitorElementStatus();
