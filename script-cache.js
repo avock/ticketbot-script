@@ -6,10 +6,12 @@ const readline = require('readline');
 require('dotenv').config();
 
 async function monitorElementStatus() {
+  const API_KEY_1 = process.env.API_KEY_1
+  const API_KEY_2 = process.env.API_KEY_2
+  const API_KEY = API_KEY_2
+  const scraperAPI = process.env.SCRAPER_API_URL
+  
   const targetURL = "https://www.ipaddress.my";
-  const API_KEY = process.env.API_KEY;
-  const scraperAPI = "http://api.scraperapi.com";
-
   // const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
   const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
 

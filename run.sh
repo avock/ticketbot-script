@@ -1,1 +1,1 @@
-node scripts/script-cache.js
+node script-cache.js
