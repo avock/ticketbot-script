@@ -1,1 +1,0 @@
-node scripts/script-proxy.js
