@@ -13,7 +13,8 @@ async function monitorElementStatus() {
   
   const targetURL = "https://www.ipaddress.my";
   // const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
-  const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
+  // const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
+  const finalURL = 'https://google.com';
 
   const elementSelector = '.an-bk';
   const OPEN_TAB_INTERVAL = 5000; // 5 seconds
@@ -34,6 +35,7 @@ async function monitorElementStatus() {
   const browser = await incognito_browser.createIncognitoBrowserContext();
   const mainPage = await browser.newPage();
 
+  // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
 
   let previousTexts = Array(openTabs.length).fill('');
@@ -42,6 +44,13 @@ async function monitorElementStatus() {
 
   await mainPage.goto(finalURL);
 
+  // method to initialize looping function calls every TIME_INTERVAL
+  async function init() {
+    setInterval(openTab, OPEN_TAB_INTERVAL)
+    setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
+  }
+
+  // main method 1 : opens a new tab + keeps reference to it via openTabs
   async function openTab() {
     const newPage = await browser.newPage();
     const customTitle = `Tab ${openTabs.length + 1}`;
@@ -53,6 +62,7 @@ async function monitorElementStatus() {
     }, customTitle);
   }
 
+  // main method 2 : evaluates all elements using ::evaluateElementStatus
   async function evaluateElement() {
     const elementStatuses = await Promise.all(
       openTabs.map((tab, index) => evaluateElementStatus(tab, index))
@@ -69,29 +79,28 @@ async function monitorElementStatus() {
 
     console.log(table.toString());
   }
-
+  
   async function evaluateElementStatus(tab, tabIndex) {
     try {
       const page = tab.page;
-      // note: current implementation only works when elementSelector is present, else will keep waiting
-      await page.waitForSelector(elementSelector);
-      const element = await page.$(elementSelector);
+      const timeout = 3000; // Timeout in milliseconds
+  
+      const element = await page.waitForSelector(elementSelector, { timeout });
+      if (!element) {
+        // Element not present, move on
+        return { status: 'Not Present', text: '' };
+      }
+  
       const elementText = await page.evaluate((el) => el.innerText, element);
-
       const status = elementText === previousTexts[tabIndex] ? 'Unchanged' : 'Changed';
-
       previousTexts[tabIndex] = elementText;
-
+  
       return { status, text: elementText };
     } catch (error) {
       return { status: 'Error', text: 'Error evaluating element status' };
     }
   }
-
-  async function init() {
-    setInterval(openTab, OPEN_TAB_INTERVAL)
-    setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
-  }
+  
 
   function createTable() {
     return new Table({
@@ -119,7 +128,7 @@ async function monitorElementStatus() {
     await browser.close();
     process.exit(0);
   });
-  
+
   init()
 }
 
