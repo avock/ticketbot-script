@@ -34,21 +34,21 @@ var tabSuccessful = false;
 
   async function monitorElementStatus() {
 
-  // // 1. to open in chrome instead of chromium, remember to run ./url.sh
-  // const incognito_browser = await puppeteer.connect({
-  //   browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
-  // });
-  // const browser = await incognito_browser.createIncognitoBrowserContext();
-  // const mainPage = await browser.newPage();
+  // 1. to open in chrome instead of chromium, remember to run ./url.sh
+  const incognito_browser = await puppeteer.connect({
+    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
+  });
+  const browser = await incognito_browser.createIncognitoBrowserContext();
+  const mainPage = await browser.newPage();
 
   // // 2. to open regularly
   // const browser = await puppeteer.launch({ headless: false });\
   // const mainPage = await browser.newPage();
   
-  // 3. to open in incognito mode
-  const incognito_browser = await puppeteer.launch({ headless: false });
-  const browser = await incognito_browser.createIncognitoBrowserContext();
-  const mainPage = await browser.newPage();
+  // // 3. to open in incognito mode
+  // const incognito_browser = await puppeteer.launch({ headless: false });
+  // const browser = await incognito_browser.createIncognitoBrowserContext();
+  // const mainPage = await browser.newPage();
 
   // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
@@ -92,6 +92,7 @@ var tabSuccessful = false;
         tabSuccessful = true
         const { title } = openTabs[index];
         addToTable(title, status.status, status.text);
+        telegram.sendMessage(groupChatID, 'HELLO THERES A SUCCESSFUL QUEUE COME CHECK')
       }
     });
     if (tabSuccessful) console.log(table.toString());
