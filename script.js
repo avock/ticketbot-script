@@ -24,9 +24,10 @@ const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
 const telegram = new TelegramBot(telegramAPI, { polling: true });
 
 // Interval and Target Element Constants
-  const targetElement = '.an-bk';
-  const OPEN_TAB_INTERVAL = 5000; // 5 seconds
-  const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
+const targetElement = '.an-bk';
+const OPEN_TAB_INTERVAL = 5000; // 5 seconds
+const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
+var tabSuccessful = false;
 
   async function monitorElementStatus() {
 
@@ -62,14 +63,17 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
 
   // main method 1 : opens a new tab + keeps reference to it via openTabs
   async function openTab() {
+    var tabsOpened = openTabs.length + 1
     const newPage = await browser.newPage();
-    const customTitle = `Tab ${openTabs.length + 1}`;
+    const customTitle = `Tab ${tabsOpened}`;
     openTabs.push({ page: newPage, title: customTitle });
 
     await newPage.goto(finalURL);
     await newPage.evaluate((customTitle) => {
       document.title = customTitle;
     }, customTitle);
+
+    console.log("Number of tabs opened: " + tabsOpened) 
   }
 
   // main method 2 : evaluates all elements using ::evaluateElementStatus
@@ -78,16 +82,14 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
       openTabs.map((tab, index) => evaluateElementStatus(tab, index))
     );
 
-    clearTable();
-
     elementStatuses.forEach((status, index) => {
-      if (status.status !== 'Unchanged') {
+      if (status.status) {
+        tabSuccessful = true
         const { title } = openTabs[index];
         addToTable(title, status.status, status.text);
       }
     });
-
-    console.log(table.toString());
+    if (tabSuccessful) console.log(table.toString());
   }
   
   async function evaluateElementStatus(tab, tabIndex) {
@@ -105,15 +107,12 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
         : (previousTexts[tabIndex] === '' || previousTexts[tabIndex] === undefined)
             ? false 
             : true
-      console.log(previousTexts[tabIndex] === '')
-      console.log(previousTexts[tabIndex])
       previousTexts[tabIndex] = elementText;
-  
+
       return { status, text: elementText };
 
     } catch (error) {
-      console.log(error)
-      return { status: 'Error', text: 'Error evaluating element status' };
+        return { status: 'Error', text: 'Error evaluating element status' };
     }
   }
 
