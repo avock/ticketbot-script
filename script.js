@@ -82,6 +82,7 @@ var tabSuccessful = false;
       openTabs.map((tab, index) => evaluateElementStatus(tab, index))
     );
 
+    // optimal solution: only adds elements that have changed to table + only print when such element present
     elementStatuses.forEach((status, index) => {
       if (status.status) {
         tabSuccessful = true
@@ -90,6 +91,14 @@ var tabSuccessful = false;
       }
     });
     if (tabSuccessful) console.log(table.toString());
+
+    // // sub-optimal solution, prints everything during every scan
+    // clearTable()
+    // elementStatuses.forEach((status, index) => {
+    //   const { title } = openTabs[index];
+    //   addToTable(title, status.status, status.text);
+    // });
+    // console.log(table.toString());
   }
   
   async function evaluateElementStatus(tab, tabIndex) {
