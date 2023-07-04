@@ -29,25 +29,26 @@ let OPEN_TAB_ID;
 let EVAL_ELEM_ID;
 const OPEN_TAB_INTERVAL = 5000; // 5 seconds
 const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
+var isPaused = false;
 var tabSuccessful = false;
 
   async function monitorElementStatus() {
 
-  // 1. to open in chrome instead of chromium, remember to run ./url.sh
-  const incognito_browser = await puppeteer.connect({
-    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
-  });
-  const browser = await incognito_browser.createIncognitoBrowserContext();
-  const mainPage = await browser.newPage();
+  // // 1. to open in chrome instead of chromium, remember to run ./url.sh
+  // const incognito_browser = await puppeteer.connect({
+  //   browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
+  // });
+  // const browser = await incognito_browser.createIncognitoBrowserContext();
+  // const mainPage = await browser.newPage();
 
   // // 2. to open regularly
   // const browser = await puppeteer.launch({ headless: false });\
   // const mainPage = await browser.newPage();
   
-  // // 3. to open in incognito mode
-  // const incognito_browser = await puppeteer.launch({ headless: false });
-  // const browser = await incognito_browser.createIncognitoBrowserContext();
-  // const mainPage = await browser.newPage();
+  // 3. to open in incognito mode
+  const incognito_browser = await puppeteer.launch({ headless: false });
+  const browser = await incognito_browser.createIncognitoBrowserContext();
+  const mainPage = await browser.newPage();
 
   // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
@@ -149,11 +150,18 @@ var tabSuccessful = false;
     output: process.stdout,
   });
 
-  input.question('Press any key and Enter to stop the script...\n', async () => {
-    input.close();
-    clearInterval(OPEN_TAB_ID);
-    clearInterval(EVAL_ELEM_ID);
-    console.log('Script stopped.');
+  input.on('line', (input) => {
+    if (input.trim() === '') {
+      isPaused = !isPaused;
+      if (isPaused) {
+        clearInterval(OPEN_TAB_ID);
+        clearInterval(EVAL_ELEM_ID);
+        console.log('Script paused. Press Enter again to resume.');
+      } else {
+        console.log('Script resumed.');
+        init();
+      }
+    }
   });
 
   init()
