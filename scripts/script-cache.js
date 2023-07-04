@@ -15,10 +15,22 @@ async function monitorElementStatus() {
 
   const elementSelector = '.an-bk';
   const delayBetweenTabs = 5000; // 5 seconds
-  const browser = await puppeteer.connect({
-    browserWSEndpoint: 'ws://localhost:9222/devtools/browser/afc5dc21-366b-40d0-87d2-9da0c797a3c1'
-  });
+  
+  // // 1. to open in chrome isntead of chromium, remember to run ./url.sh
+  // const browser = await puppeteer.connect({
+  //   browserWSEndpoint: 'ws://localhost:9222/devtools/browser/afc5dc21-366b-40d0-87d2-9da0c797a3c1'
+  // });
+  // const mainPage = await browser.newPage();
+  
+  // // 2. to open regularly
+  // const browser = await puppeteer.launch({ headless: false });\
+  // const mainPage = await browser.newPage();
+  
+  // 3. to open in incognito mode
+  const incognito_browser = await puppeteer.launch({ headless: false });
+  const browser = await incognito_browser.createIncognitoBrowserContext();
   const mainPage = await browser.newPage();
+
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
 
   let previousTexts = Array(openTabs.length).fill('');
