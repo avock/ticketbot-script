@@ -33,20 +33,21 @@ var tabSuccessful = false;
 
   async function monitorElementStatus() {
 
-  // // 1. to open in chrome isntead of chromium, remember to run ./url.sh
-  // const browser = await puppeteer.connect({
-  //   browserWSEndpoint: 'ws://localhost:9222/devtools/browser/afc5dc21-366b-40d0-87d2-9da0c797a3c1'
-  // });
-  // const mainPage = await browser.newPage();
+  // 1. to open in chrome instead of chromium, remember to run ./url.sh
+  const incognito_browser = await puppeteer.connect({
+    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/cc5208d1-a168-4ef1-9728-72f9625c5b69'
+  });
+  const browser = await incognito_browser.createIncognitoBrowserContext();
+  const mainPage = await browser.newPage();
 
   // // 2. to open regularly
   // const browser = await puppeteer.launch({ headless: false });\
   // const mainPage = await browser.newPage();
   
-  // 3. to open in incognito mode
-  const incognito_browser = await puppeteer.launch({ headless: false });
-  const browser = await incognito_browser.createIncognitoBrowserContext();
-  const mainPage = await browser.newPage();
+  // // 3. to open in incognito mode
+  // const incognito_browser = await puppeteer.launch({ headless: false });
+  // const browser = await incognito_browser.createIncognitoBrowserContext();
+  // const mainPage = await browser.newPage();
 
   // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
