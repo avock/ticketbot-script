@@ -35,7 +35,7 @@ var tabSuccessful = false;
 
   // 1. to open in chrome instead of chromium, remember to run ./url.sh
   const incognito_browser = await puppeteer.connect({
-    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/cc5208d1-a168-4ef1-9728-72f9625c5b69'
+    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
   });
   const browser = await incognito_browser.createIncognitoBrowserContext();
   const mainPage = await browser.newPage();

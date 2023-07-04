@@ -13,7 +13,12 @@ url=$(echo "$json" | grep -o '"webSocketDebuggerUrl": "[^"]*' | grep -o 'ws://[^
 # Replace "localhost" with "127.0.0.1"
 url=$(echo "$url" | sed 's/localhost/127.0.0.1/')
 
+# Trim leading and trailing whitespace and newline from the URL
+url=$(echo "$url" | awk '{$1=$1};1' | tr -d '\n')
+
+# Copy the modified URL to the clipboard
+echo -n "$url" | pbcopy
+
 # Print the modified URL
 echo "WebSocket Debugger URL: $url"
-echo "$url" | pbcopy
 echo "URL copied to clipboard."
