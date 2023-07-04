@@ -100,16 +100,22 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
       // obtains text within targetElement
       const elementText = await page.evaluate((el) => el.innerText, element);
       // checks if text in element is changed
-      const status = elementText === previousTexts[tabIndex] ? false : true;
+      const status = (elementText === previousTexts[tabIndex])
+        ? false 
+        : (previousTexts[tabIndex] === '' || previousTexts[tabIndex] === undefined)
+            ? false 
+            : true
+      console.log(previousTexts[tabIndex] === '')
+      console.log(previousTexts[tabIndex])
       previousTexts[tabIndex] = elementText;
   
       return { status, text: elementText };
 
     } catch (error) {
+      console.log(error)
       return { status: 'Error', text: 'Error evaluating element status' };
     }
   }
-  
 
   function createTable() {
     return new Table({
