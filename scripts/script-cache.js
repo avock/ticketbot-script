@@ -1,4 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
 const Table = require('cli-table3');
 const readline = require('readline');
 require('dotenv').config();
@@ -27,6 +29,7 @@ async function monitorElementStatus() {
   async function evaluateElementStatus(tab, tabIndex) {
     try {
       const page = tab.page;
+      // note: current implementation only works when elementSelector is present, else will keep waiting
       await page.waitForSelector(elementSelector);
       const element = await page.$(elementSelector);
       const elementText = await page.evaluate((el) => el.innerText, element);
