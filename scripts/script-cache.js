@@ -9,10 +9,16 @@ async function monitorElementStatus() {
   const scraperAPI = "http://api.scraperapi.com";
 
   // const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
-  const finalURL = 'https://www.google.com';
+  const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
   
+  // Create and display the table
+  const table = new Table({
+    head: ['Tab Title', 'Status', 'Element Text'],
+    colWidths: [20, 20, 40],
+  });
 
-  const elementSelector = '#hlLinkToQueueTicket2';
+  // const elementSelector = '#hlLinkToQueueTicket2';
+  const elementSelector = '.an-bk';
   const delayBetweenTabs = 5000; // 5 seconds
   const monitoringInterval = 5000; // 5 seconds
 
@@ -44,33 +50,27 @@ async function monitorElementStatus() {
   await mainPage.goto(finalURL);
 
   // Monitor the element status at a regular interval
-  setInterval(async () => {
+  async function monitorElementStatus() {
     const elementStatuses = await Promise.all(
       openTabs.map((tab, index) => evaluateElementStatus(tab, index))
     );
-
-    // Create and display the table
-    const table = new Table({
-      head: ['Tab Title', 'Status', 'Element Text'],
-      colWidths: [20, 20, 40],
-    });
+      
+    table.splice(0);
 
     elementStatuses.forEach((status, index) => {
       const { title } = openTabs[index];
       const row = [title, status.status, status.text];
       table.push(row);
     });
-
-    console.log(table.toString());
-  }, monitoringInterval);
+  }
 
   // Open additional websites in new tabs with custom titles
   const input = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
+  });  
 
-  input.question('Press any key and Enter to stop the script...', async () => {
+  input.question('Press any key and Enter to stop the script...\n', async () => {
     input.close();
     await browser.close();
     process.exit(0);
@@ -85,6 +85,8 @@ async function monitorElementStatus() {
     await newPage.evaluate((customTitle) => {
       document.title = customTitle; // Set the browser tab title to the custom title
     }, customTitle);
+    monitorElementStatus();
+    console.log(table.toString());
   }
 }
 

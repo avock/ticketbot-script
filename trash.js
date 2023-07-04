@@ -9,13 +9,6 @@ const scraperAPI = "http://api.scraperapi.com";
 
 // const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
 const finalURL = 'https://www.google.com';
-
-// setup puppeteer to open browser and launch new tabs
-const browser = puppeteer.launch({ headless: false});
-const mainPage = browser.newPage();
-// Store references to all open tabs with custom titles
-var openTabs = [{ page: mainPage, title: 'Main Tab' }]; 
-
 const elementSelector = '#hlLinkToQueueTicket2';
 const delayBetweenTabs = 5000; // 5 seconds
 const monitoringInterval = 5000; // 5 seconds
@@ -76,6 +69,12 @@ async function newTabHelper() {
 }
 
 async function init() { 
+
+    // setup puppeteer to open browser and launch new tabs
+    const browser = await puppeteer.launch({ headless: false});
+    const mainPage = await browser.newPage();
+    // Store references to all open tabs with custom titles
+    var openTabs = [{ page: mainPage, title: 'Main Tab' }]; 
 
   // Open initial website in the main tab
   await mainPage.goto(finalURL);
