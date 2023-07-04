@@ -55,12 +55,15 @@ async function monitorElementStatus() {
       openTabs.map((tab, index) => evaluateElementStatus(tab, index))
     );
       
+    // clears table then re-enters every single element
     table.splice(0);
 
     elementStatuses.forEach((status, index) => {
-      const { title } = openTabs[index];
-      const row = [title, status.status, status.text];
-      table.push(row);
+      if(status.status === 'Changed') {        
+        const { title } = openTabs[index];
+        const row = [title, status.status, status.text];
+        table.push(row);
+      }
     });
   }
 
