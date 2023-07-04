@@ -25,6 +25,8 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
 
 // Interval and Target Element Constants
 const targetElement = '.an-bk';
+let OPEN_TAB_ID;
+let EVAL_ELEM_ID;
 const OPEN_TAB_INTERVAL = 5000; // 5 seconds
 const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
 var tabSuccessful = false;
@@ -57,8 +59,8 @@ var tabSuccessful = false;
 
   // method to initialize looping function calls every TIME_INTERVAL
   async function init() {
-    setInterval(openTab, OPEN_TAB_INTERVAL)
-    setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
+    OPEN_TAB_ID = setInterval(openTab, OPEN_TAB_INTERVAL)
+    EVAL_ELEM_ID = setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
   }
 
   // main method 1 : opens a new tab + keeps reference to it via openTabs
@@ -148,8 +150,9 @@ var tabSuccessful = false;
 
   input.question('Press any key and Enter to stop the script...\n', async () => {
     input.close();
-    await browser.close();
-    process.exit(0);
+    clearInterval(OPEN_TAB_ID);
+    clearInterval(EVAL_ELEM_ID);
+    console.log('Script stopped.');
   });
 
   init()
