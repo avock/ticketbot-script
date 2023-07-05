@@ -7,6 +7,7 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 
 // API/Keys Declaration
+const BROWSER_ENDPOINT = process.argv[2]
 const API_KEY_1 = process.env.API_KEY_1
 const API_KEY_2 = process.env.API_KEY_2
 const API_KEY = API_KEY_2
@@ -36,7 +37,7 @@ var tabSuccessful = false;
 
   // 1. to open in chrome instead of chromium, remember to run ./url.sh
   const incognito_browser = await puppeteer.connect({
-    browserWSEndpoint: 'ws://127.0.0.1:9222/devtools/browser/e1c7852f-69c7-40dd-9813-87481d91f053'
+    browserWSEndpoint: BROWSER_ENDPOINT
   });
   const browser = await incognito_browser.createIncognitoBrowserContext();
   const mainPage = await browser.newPage();
