@@ -43,8 +43,9 @@ var tabSuccessful = false;
   const mainPage = await browser.newPage();
 
   // // 2. to open regularly
-  // const browser = await puppeteer.launch({ headless: false });\
+  // const browser = await puppeteer.launch({ headless: false });
   // const mainPage = await browser.newPage();
+  // await mainPage.setViewport({ width: 1920, height: 1080 });
   
   // // 3. to open in incognito mode
   // const incognito_browser = await puppeteer.launch({ headless: false });
@@ -77,7 +78,7 @@ var tabSuccessful = false;
     await newPage.evaluate((customTitle) => {
       document.title = customTitle;
     }, customTitle);
-
+    
     console.log("Number of tabs opened: " + tabsOpened) 
   }
 
