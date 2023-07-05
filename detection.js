@@ -51,7 +51,7 @@ async function monitorElementChange() {
       }
     }
 
-    await sleep(5000); // Wait for 5 seconds before the next iteration
+    await sleep(30000); // Wait for 15 seconds before the next iteration
   }
 }
 

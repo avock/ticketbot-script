@@ -28,8 +28,8 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
 const targetElement = '.an-bk';
 let OPEN_TAB_ID;
 let EVAL_ELEM_ID;
-const OPEN_TAB_INTERVAL = 5000; // 5 seconds
-const EVAL_ELEM_INTERVAL = 1000; // 1 seconds
+const OPEN_TAB_INTERVAL = 3000; // 5 seconds
+const EVAL_ELEM_INTERVAL = 10000; // 1 seconds
 var isPaused = false;
 var tabSuccessful = false;
 
@@ -94,7 +94,7 @@ var tabSuccessful = false;
         tabSuccessful = true
         const { title } = openTabs[index];
         addToTable(title, status.status, status.text);
-        telegram.sendMessage(groupChatID, 'HELLO THERES A SUCCESSFUL QUEUE COME CHECK')
+        // telegram.sendMessage(groupChatID, 'HELLO THERES A SUCCESSFUL QUEUE COME CHECK')
       }
     });
     if (tabSuccessful) console.log(table.toString());
