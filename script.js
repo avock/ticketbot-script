@@ -1,37 +1,19 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
-const Table = require('cli-table3');
 const readline = require('readline');
 require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
 
 // API/Keys Declaration
 const BROWSER_ENDPOINT = process.argv[2]
-const API_KEY_1 = process.env.API_KEY_1
-const API_KEY_2 = process.env.API_KEY_2
-const API_KEY = API_KEY_2
-const scraperAPI = process.env.SCRAPER_API_URL
-const telegramAPI = process.env.TELEGRAM_BOT_API
-const groupChatID = process.env.GROUP_CHAT_ID
 
-// Constant Declaration for Web Bot
-const targetURL = "https://www.ipaddress.my";
-// const initialURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
 const taytayURL = 'https://google.com'
 const initialURL = 'https://ticketmaster.sg/login';
 const finalURL = 'https://click.mailing.ticketmaster.com/?qs=2d32134119df64f25e745e413bfa5c0d7adb93969de6de7c11f82ff431185145ea34971a579f8e42bd8a57691121379a8f9a5576413829b491030b11f2a019f5';
 
-// Telegram Bot Declaration
-const telegram = new TelegramBot(telegramAPI, { polling: true });
-
-// Interval and Target Element Constants
-const targetElement = '.an-bk';
 let OPEN_TAB_ID;
 const OPEN_TAB_INTERVAL = 3000; // 5 seconds
-const EVAL_ELEM_INTERVAL = 10000; // 1 seconds
 var isPaused = false;
-var tabSuccessful = false;
 
   async function monitorElementStatus() {
 
