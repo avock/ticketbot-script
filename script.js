@@ -17,9 +17,10 @@ const groupChatID = process.env.GROUP_CHAT_ID
 
 // Constant Declaration for Web Bot
 const targetURL = "https://www.ipaddress.my";
-// const finalURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
-const finalURL = 'https://ticketmaster.sg/activity/detail/24_taylorswift';
-// const finalURL = 'https://google.com';
+// const initialURL = `${scraperAPI}?api_key=${API_KEY}&url=${targetURL}`;
+const taytayURL = 'https://google.com'
+const initialURL = 'https://ticketmaster.sg/login';
+const finalURL = 'https://click.mailing.ticketmaster.com/?qs=2d32134119df64f25e745e413bfa5c0d7adb93969de6de7c11f82ff431185145ea34971a579f8e42bd8a57691121379a8f9a5576413829b491030b11f2a019f5';
 
 // Telegram Bot Declaration
 const telegram = new TelegramBot(telegramAPI, { polling: true });
@@ -27,7 +28,6 @@ const telegram = new TelegramBot(telegramAPI, { polling: true });
 // Interval and Target Element Constants
 const targetElement = '.an-bk';
 let OPEN_TAB_ID;
-let EVAL_ELEM_ID;
 const OPEN_TAB_INTERVAL = 3000; // 5 seconds
 const EVAL_ELEM_INTERVAL = 10000; // 1 seconds
 var isPaused = false;
@@ -54,99 +54,50 @@ var tabSuccessful = false;
 
   // keeping track of all open tabs
   const openTabs = [{ page: mainPage, title: 'Main Tab' }];
-  // keeping track of all texts
-  let previousTexts = Array(openTabs.length).fill('');
 
-  const table = createTable();
-
-  await mainPage.goto(finalURL);
+  await mainPage.goto(taytayURL);
 
   // method to initialize looping function calls every TIME_INTERVAL
   async function init() {
     OPEN_TAB_ID = setInterval(openTab, OPEN_TAB_INTERVAL)
-    EVAL_ELEM_ID = setInterval(evaluateElement, EVAL_ELEM_INTERVAL)
   }
 
   // main method 1 : opens a new tab + keeps reference to it via openTabs
   async function openTab() {
-    var tabsOpened = openTabs.length + 1
-    const newPage = await browser.newPage();
-    const customTitle = `Tab ${tabsOpened}`;
-    openTabs.push({ page: newPage, title: customTitle });
-
-    await newPage.goto(finalURL);
-    await newPage.evaluate((customTitle) => {
-      document.title = customTitle;
-    }, customTitle);
-    
-    console.log("Number of tabs opened: " + tabsOpened) 
-  }
-
-  // main method 2 : evaluates all elements using ::evaluateElementStatus
-  async function evaluateElement() {
-    const elementStatuses = await Promise.all(
-      openTabs.map((tab, index) => evaluateElementStatus(tab, index))
-    );
-
-    // optimal solution: only adds elements that have changed to table + only print when such element present
-    elementStatuses.forEach((status, index) => {
-      if (status.status) {
-        tabSuccessful = true
-        const { title } = openTabs[index];
-        addToTable(title, status.status, status.text);
-        // telegram.sendMessage(groupChatID, 'HELLO THERES A SUCCESSFUL QUEUE COME CHECK')
-      }
-    });
-    if (tabSuccessful) console.log(table.toString());
-
-    // // sub-optimal solution, prints everything during every scan
-    // clearTable()
-    // elementStatuses.forEach((status, index) => {
-    //   const { title } = openTabs[index];
-    //   addToTable(title, status.status, status.text);
-    // });
-    // console.log(table.toString());
-  }
-  
-  async function evaluateElementStatus(tab, tabIndex) {
     try {
-      const page = tab.page;
-      const timeout = 1000; 
-
-      // produces an error if element doesn't exist
-      const element = await page.waitForSelector(targetElement, { timeout });
-      // obtains text within targetElement
-      const elementText = await page.evaluate((el) => el.innerText, element);
-      // checks if text in element is changed
-      const status = (elementText === previousTexts[tabIndex])
-        ? false 
-        : (previousTexts[tabIndex] === '' || previousTexts[tabIndex] === undefined)
-            ? false 
-            : true
-      previousTexts[tabIndex] = elementText;
-
-      return { status, text: elementText };
-
+      var tabsOpened = openTabs.length + 1;
+      const newPage = await browser.newPage();
+      const customTitle = `Tab ${tabsOpened}`;
+      openTabs.push({ page: newPage, title: customTitle });
+  
+      await newPage.goto(initialURL);
+  
+      const signInFormUsernameExists = await newPage.$('#signInFormUsername');
+      const signInFormPasswordExists = await newPage.$('#signInFormPassword');
+  
+      if (signInFormUsernameExists && signInFormPasswordExists) {
+        await newPage.waitForSelector('#signInFormUsername');
+        await newPage.type('#signInFormUsername', 'ooijessie@hotmail.com');
+  
+        await newPage.waitForSelector('#signInFormPassword');
+        await newPage.type('#signInFormPassword', 'Battleground.1');
+      }
+  
+      await newPage.waitForSelector('.btn-primary');
+      await newPage.click('.btn-primary');
+      
+      await newPage.goto(finalURL);
+      
+      await newPage.evaluate((customTitle) => {
+        document.title = customTitle;
+      }, customTitle);
+  
+      console.log("Number of tabs opened: " + tabsOpened);
     } catch (error) {
-        return { status: 'Error', text: 'Error evaluating element status' };
+      // Handle the error
+      console.error("An error occurred while opening the tab:", error);
     }
-  }
-
-  function createTable() {
-    return new Table({
-      head: ['Tab Title', 'Changed?', 'Element Text'],
-      colWidths: [20, 20, 40],
-    });
-  }
-
-  function clearTable() {
-    table.splice(0);
-  }
-
-  function addToTable(title, status, text) {
-    const row = [title, status, text];
-    table.push(row);
-  }
+  }  
 
   const input = readline.createInterface({
     input: process.stdin,
