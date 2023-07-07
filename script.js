@@ -56,7 +56,7 @@ var isPaused = false;
   // main method 1 : opens a new tab + keeps reference to it via openTabs
   async function openTab() {
     try {
-      if (openTabs.length <= 3) {
+      if (openTabs.length <= 60) {
         var tabsOpened = openTabs.length;
         const newPage = await browser.newPage();
         const customTitle = `Tab ${tabsOpened}`;
@@ -151,7 +151,7 @@ var isPaused = false;
         console.log('All tabs refreshed')
       }
     } else {
-      console.log('failed')
+      console.log('pause first')
     }
   });
 
