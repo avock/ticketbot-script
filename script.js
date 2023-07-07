@@ -56,7 +56,7 @@ var isPaused = false;
   // main method 1 : opens a new tab + keeps reference to it via openTabs
   async function openTab() {
     try {
-      if (openTabs.length <= 60) {
+      if (openTabs.length <= 3) {
         var tabsOpened = openTabs.length;
         const newPage = await browser.newPage();
         const customTitle = `Tab ${tabsOpened}`;
@@ -87,6 +87,9 @@ var isPaused = false;
         }, customTitle);
     
         console.log("Number of tabs opened: " + tabsOpened);
+      } else {
+        clearInterval(OPEN_TAB_ID);
+        console.log('all tabs opened')
       }
     } catch (error) {
       // Handle the error
@@ -95,24 +98,31 @@ var isPaused = false;
   }  
 
   async function navigateAllTabs(url) {
-    const refreshTabs = openTabs.map(tab => {
-      return new Promise(async (resolve) => {
-        await tab.page.goto(url)
+    try {
+      const refreshTabs = openTabs.map(tab => {
+        return new Promise(async (resolve) => {
+          await tab.page.goto(url)
+        })
       })
-    })
-
-    await Promise.all(refreshTabs)
+  
+      await Promise.all(refreshTabs)
+    } catch (error) {
+      console.log('Something when wrong when redirecting. Error: ' + error)
+    }
   }
 
   async function refreshAllTabs() {
-    console.log('test2')
-    const refreshTabs = openTabs.map(tab => {
-      return new Promise(async (resolve) => {
-        await tab.page.reload()
+    try {
+      const refreshTabs = openTabs.map(tab => {
+        return new Promise(async (resolve) => {
+          await tab.page.reload()
+        })
       })
-    })
-
-    await Promise.all(refreshTabs)
+  
+      await Promise.all(refreshTabs)
+    } catch (error) {
+      console.log('Something when wrong when refreshing. Error: ' + error)
+    }
   }
 
   const input = readline.createInterface({
